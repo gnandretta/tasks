@@ -8,7 +8,7 @@ platform when written in a popular format such as markdown.
 
 ## Design
 
-- [ ] Find tasks in a markdown file—output should contain only headlines and
+- [x] Find tasks in a markdown file—output should contain only headlines and
       tasks.
 - [ ] Find tasks in a directory—search in markdown files from the directory and
       recursively in its sub-directories.
