@@ -14,17 +14,17 @@ platform when written in a popular format such as markdown.
       recursively in its sub-directories.
 - [ ] Allow search operations to filter out completed tasks.
 - [ ] Attempt to integrate with an existent prompt library. Otherwise, page
-      results and allow to select and open a tasks with `vim` or `$EDITOR`.
-      - [inquirer](https://www.npmjs.com/package/inquirer).
-      - [prompt](https://www.npmjs.com/package/prompt).
-      - [enquirer](https://www.npmjs.com/package/enquirer).
+      results and allow to select and open a tasks with `vim` or `$EDITOR`—try
+      [inquirer](https://www.npmjs.com/package/inquirer),
+      [prompt](https://www.npmjs.com/package/prompt), and
+      [enquirer](https://www.npmjs.com/package/enquirer).
 - [ ] Support metadata for tracking.
-      - [ ] *schedule* contains the date/time? to start working on the task.
-      - [ ] *deadline* contains the latest date/time? the task should be completed.
-      - [ ] *completed at* contains the date/time? the task was completed.
-      - [ ] *next* (default?) indicates the task should be completed in the
-            immediate future, *someday* is for the distant future, *maybe* for
-            task that may or may not be started.
+  - [ ] *schedule* contains the date/time? to start working on the task.
+  - [ ] *deadline* contains the latest date/time? the task should be completed.
+  - [ ] *completed at* contains the date/time? the task was completed.
+  - [ ] *next* (default?) indicates the task should be completed in the
+        immediate future, *someday* is for the distant future, *maybe* for task
+        that may or may not be started.
 - [ ] Support nested tasks—as the one from above for the tracking metadata
       support. More than one level of nesting seems unlikely.
 - [ ] Support metadata tasks.
