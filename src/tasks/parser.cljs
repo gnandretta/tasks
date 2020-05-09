@@ -20,11 +20,21 @@
       [task lines]
       (parse-task-multi-line (update task :raw str "\n" line)
                             (rest lines)))))
+(defn parse-task-meta [task lines]
+  (let [line (first lines)
+        indent (apply str (repeat (:indent task) " "))
+        meta-re (re-pattern (str indent "-.*"))]
+    (if (and line (re-matches meta-re line))
+      (parse-task-meta (update task :meta (fnil conj []) line)
+                       (rest lines))
+      [task lines])))
 
 (defn parse-task [state]
-  (when-let [raw (re-matches #"- \[.?\] .+" (first (:lines state)))]
-    (let [task {:raw raw}
-          [task lines] (parse-task-multi-line task (rest (:lines state)))]
+  (when-let [[raw markup] (re-matches #"(- \[.?\] ).+" (first (:lines state)))]
+    (let [task {:raw raw :indent (count markup)}
+          lines (rest (:lines state))
+          [task lines] (parse-task-multi-line task lines)
+          [task lines] (parse-task-meta task lines)]
       (-> state
           (update-in (concat [:tree] (:headings state) [:tasks])
                      (fnil conj [])
