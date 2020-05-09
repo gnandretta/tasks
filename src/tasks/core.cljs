@@ -8,4 +8,5 @@
       p/parse))
 
 (comment
-  (find-tasks "resources/tasks.md"))
+  (require '[clojure.pprint :refer [pprint]])
+  (pprint (find-tasks "resources/tasks.md")))
