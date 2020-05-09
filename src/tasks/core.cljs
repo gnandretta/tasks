@@ -1,5 +1,11 @@
-(ns tasks.core)
+(ns tasks.core
+  (:require [tasks.fs :as fs]
+            [tasks.parser :as p]))
+
+(defn find-tasks [path]
+  (-> path
+      fs/read-file
+      p/parse))
 
 (comment
-  (require '[tasks.fs :as fs])
-  (fs/read-file "resources/tasks.md"))
+  (find-tasks "resources/tasks.md"))
