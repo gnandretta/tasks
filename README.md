@@ -10,7 +10,7 @@ platform when written in a popular format such as markdown.
 
 - [x] Find tasks in a markdown file—output should contain only headlines and
       tasks.
-- [ ] Find tasks in a directory—search in markdown files from the directory and
+- [x] Find tasks in a directory—search in markdown files from the directory and
       recursively in its sub-directories.
 - [ ] Allow search operations to filter out completed tasks.
 - [ ] Attempt to integrate with an existent prompt library. Otherwise, page
