@@ -12,7 +12,7 @@ platform when written in a popular format such as markdown.
       tasks.
 - [x] Find tasks in a directory—search in markdown files from the directory and
       recursively in its sub-directories.
-- [-] Filter completed tasks.
+- [ ] Filter completed tasks.
   - [x] Include completion data in the parsed tree.
   - [ ] Show only incomplete tasks.
   - [ ] Show only complete tasks.
