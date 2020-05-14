@@ -1,7 +1,9 @@
 (ns tasks.core
   (:require [tasks.fs :as fs]
             [tasks.parser :as p]
-            [clojure.core.async :refer [<! chan close! go put!]]))
+            [tasks.prompt :refer [prompt]]
+            [clojure.core.async :refer [<! chan close! go put!]]
+            [clojure.string :as str]))
 
 (defn find-tasks-in-files [paths]
   (let [c (chan)]
@@ -35,8 +37,10 @@
            tree)))
 
 (comment
-  (require '[clojure.pprint :refer [pprint]])
   (go (->> (<! (find-tasks "resources/**/*.md"))
            (mapcat (comp flatten-tree :tree))
-           (map println)
-           doall)))
+           (map (fn [s]
+                  (if (str/starts-with? s "#")
+                    {:disabled s}
+                    s)))
+           prompt)))
