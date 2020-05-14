@@ -7,7 +7,7 @@
   (let [c (chan)]
     (doseq [path paths]
       (put! c {:path path
-               :tasks (-> path fs/read-file p/parse)}))
+               :tree (-> path fs/read-file p/parse)}))
     (close! c)
     c))
 
