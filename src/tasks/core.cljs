@@ -18,6 +18,25 @@
             (recur (conj xs x)))
           xs))))
 
+(defn flatten-tree ; TODO rename
+  ([tree] (flatten-tree tree 1))
+  ([tree lvl]
+   (reduce (fn [xs [k v]]
+             (cond
+               (string? k)
+               (apply conj
+                      xs
+                      (str (apply str (repeat lvl "#")) " " k)
+                      (flatten-tree v (inc lvl)))
+               (= k :tasks)
+               (apply conj xs (map :raw v))
+               :else xs))
+           []
+           tree)))
+
 (comment
   (require '[clojure.pprint :refer [pprint]])
-  (go (pprint (<! (find-tasks "resources/**/*.md")))))
+  (go (->> (<! (find-tasks "resources/**/*.md"))
+           (mapcat (comp flatten-tree :tree))
+           (map println)
+           doall)))
