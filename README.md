@@ -21,7 +21,6 @@ platform when written in a popular format such as markdown.
   - [x] Try [inquirer](https://www.npmjs.com/package/inquirer),
         [prompt](https://www.npmjs.com/package/prompt), and
         [enquirer](https://www.npmjs.com/package/enquirer).
-        
     Settled with enquirer, liked more the docs than inquirer's and prompt
     doesn't seem as powerful as those two.
   - [ ] Open task with `vim` or `$EDITOR`.
