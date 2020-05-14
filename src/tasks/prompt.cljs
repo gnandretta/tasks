@@ -5,8 +5,9 @@
 (defn prompt [choices]
   (let [c (chan)]
     (->
-     (e/prompt (clj->js {:type "select"
-                         :message "pick"
-                         :choices choices}))
+     (e/Select. (clj->js {:type "select"
+                          :message "pick"
+                          :choices choices}))
+     .run
      (.then (fn [resp] (put! c resp))))
     c))

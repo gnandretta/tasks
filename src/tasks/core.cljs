@@ -37,10 +37,11 @@
            tree)))
 
 (comment
-  (go (->> (<! (find-tasks "resources/**/*.md"))
-           (mapcat (comp flatten-tree :tree))
-           (map (fn [s]
-                  (if (str/starts-with? s "#")
-                    {:disabled s}
-                    s)))
-           prompt)))
+  (go (let [selection (<! (->> (<! (find-tasks "resources/**/*.md"))
+                               (mapcat (comp flatten-tree :tree))
+                               (map (fn [s]
+                                      (if (str/starts-with? s "#")
+                                        {:disabled s}
+                                        s)))
+                               prompt))]
+        (println selection))))
