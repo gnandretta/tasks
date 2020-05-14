@@ -30,8 +30,10 @@
       [task lines])))
 
 (defn parse-task [state]
-  (when-let [raw (re-matches #"- \[.?\] .+" (first (:lines state)))]
-    (let [task {:raw raw :indent 2} ; for nested tasks needs to be derived
+  (when-let [[raw check] (re-matches #"- \[(.)?\] .+" (first (:lines state)))]
+    (let [task {:raw raw
+                :indent 2 ; for nested tasks needs to be derived
+                :completed? (contains? #{"x" "X"} check)}
           lines (rest (:lines state))
           [task lines] (parse-task-multi-line task lines)
           [task lines] (parse-task-meta task lines)]

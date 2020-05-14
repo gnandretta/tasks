@@ -20,7 +20,7 @@
   - metadata
 
   some content.
-- [ ] task 1.1.1b with content.
+- [X] task 1.1.1b with content.
 
   some content.
 
