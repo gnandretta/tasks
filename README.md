@@ -12,12 +12,21 @@ platform when written in a popular format such as markdown.
       tasks.
 - [x] Find tasks in a directory—search in markdown files from the directory and
       recursively in its sub-directories.
-- [ ] Allow search operations to filter out completed tasks.
+- [-] Filter completed tasks.
+  - [x] Include completion data in the parsed tree.
+  - [ ] Show only incomplete tasks.
+  - [ ] Show only complete tasks.
 - [ ] Attempt to integrate with an existent prompt library. Otherwise, page
-      results and allow to select and open a tasks with `vim` or `$EDITOR`—try
-      [inquirer](https://www.npmjs.com/package/inquirer),
-      [prompt](https://www.npmjs.com/package/prompt), and
-      [enquirer](https://www.npmjs.com/package/enquirer).
+      results and allow to select and open a tasks.
+  - [x] Try [inquirer](https://www.npmjs.com/package/inquirer),
+        [prompt](https://www.npmjs.com/package/prompt), and
+        [enquirer](https://www.npmjs.com/package/enquirer).
+        
+    Settled with enquirer, liked more the docs than inquirer's and prompt
+    doesn't seem as powerful as those two.
+  - [ ] Open task with `vim` or `$EDITOR`.
+- [ ] Build script.
+- [ ] Improve prompts—do more than just show all tasks from all files.
 - [ ] Support metadata for tracking.
   - [ ] *schedule* contains the date/time? to start working on the task.
   - [ ] *deadline* contains the latest date/time? the task should be completed.
@@ -27,7 +36,7 @@ platform when written in a popular format such as markdown.
         that may or may not be started.
 - [ ] Support nested tasks—as the one from above for the tracking metadata
       support. More than one level of nesting seems unlikely.
-- [ ] Support metadata tasks.
+- [ ] Support partially completed tasks—`[-]`.
 - [ ] Google calendar sync. Maybe this is all it takes for mobile.
 - [ ] Log actions. Most likely, it will involve updating the prompts and
       implementing commands that can be executed from the text editor. Logging
