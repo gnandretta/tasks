@@ -58,4 +58,4 @@
     (if-let [new-state (and (seq (:lines state))
                             (parse-line state))]
       (recur new-state)
-      state)))
+      (:tree state))))
