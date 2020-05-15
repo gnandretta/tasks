@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "enquirer": "^2.3.5",
     "glob": "^7.1.6",
     "source-map-support": "^0.5.19"
   }
