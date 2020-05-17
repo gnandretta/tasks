@@ -18,6 +18,16 @@
             (recur (conj xs x)))
           xs))))
 
+(defn filter-tasks [pred nodes]
+  (->> nodes
+       (map (fn [[props sections]]
+              (let [sections (filter-tasks pred sections)
+                    tasks (filter pred (:tasks props))]
+                (if (and (empty? tasks) (empty? sections))
+                  nil
+                  [(assoc props :tasks tasks) sections]))))
+       (filter some?)))
+
 (defn print-tasks [tasks]
   (doseq [task tasks]
     (println (:raw task))))
@@ -31,5 +41,6 @@
 (comment
   (require '[clojure.pprint :refer [pprint]])
   (go (->> (<! (find-tasks "resources/**/*.md"))
+           (filter-tasks (complement :completed?))
            (map print-node)
            doall)))
