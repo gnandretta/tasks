@@ -9,10 +9,14 @@
                     (update :offset inc))]
       [line state])))
 
+(defn parse-line [state re]
+  (when-let [[line state] (read-line state)]
+    (when-let [match (re-matches re line)]
+      [match state])))
+
 (defn parse-heading [{:keys [offset depth] :as state}]
-  (let [[line state*] (read-line state)
-        [raw hashes text :as match] (and line (re-matches #"(#+)\s+(.+)" line))]
-    (when (and match (> (count hashes) depth))
+  (let [[[raw hashes text :as m] state*] (parse-line state #"(#+)\s+(.+)")]
+    (when (and m (> (count hashes) depth))
        (let [heading {:type :heading
                       :raw raw
                       :rank (count hashes)
@@ -33,18 +37,17 @@
                              state*))))
 
 (defn parse-task-meta [task state]
-  (let [[line state*] (read-line state)
-        indent (apply str (repeat (:indent task) " "))
-        meta-re (re-pattern (str indent "-.*"))]
-    (if (and line (re-matches meta-re line))
+  (let [indent (apply str (repeat (:indent task) " "))
+        meta-re (re-pattern (str indent "-.*"))
+        [line state*] (parse-line state meta-re)]
+    (if line
       (parse-task-meta (update task :meta (fnil conj []) line)
                        state*)
       [task state])))
 
-(defn parse-task [{:keys [lines offset] :as state}]
-  (let [[line state*] (read-line state)
-        [raw check text :as match] (re-matches #"- \[(.)?\] (.+)" line)]
-    (when match
+(defn parse-task [{:keys [offset] :as state}]
+  (let [[[raw check text :as m] state*] (parse-line state #"- \[(.)?\] (.+)")]
+    (when m
       (let [task {:raw raw
                   :indent 2 ; for nested tasks needs to be derived
                   :completed? (contains? #{"x" "X"} check)
