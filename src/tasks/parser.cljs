@@ -1,23 +1,28 @@
 (ns tasks.parser
   (:require [clojure.string :as s]))
 
-(defn parse-heading [{:keys [lines offset depth] :as state}]
-  (when-let [[raw hashes text] (and (first lines)
-                                  (re-matches #"(#+)\s+(.+)" (first lines)))]
-    (when (> (count hashes) depth)
-      (let [heading {:type :heading
-                     :raw raw
-                     :rank (count hashes)
-                     :text (s/trim text)
-                     :line offset}
-            state (-> state
-                      (update :lines rest)
-                      (update :offset inc)
-                      (assoc :depth (count hashes)))]
-        [heading state]))))
+(defn read-line [{:keys [lines] :as state}]
+  (when (seq lines)
+    (let [line (first lines)
+          state (-> state
+                    (update :lines rest)
+                    (update :offset inc))]
+      [line state])))
 
-(defn parse-task-multi-line [task {:keys [lines] :as state}]
-  (let [line (first lines)]
+(defn parse-heading [{:keys [offset depth] :as state}]
+  (let [[line state*] (read-line state)
+        [raw hashes text :as match] (and line (re-matches #"(#+)\s+(.+)" line))]
+    (when (and match (> (count hashes) depth))
+       (let [heading {:type :heading
+                      :raw raw
+                      :rank (count hashes)
+                      :text (s/trim text)
+                      :line offset}
+             state* (assoc state* :depth (count hashes))]
+         [heading state*]))))
+
+(defn parse-task-multi-line [task state]
+  (let [[line state*] (read-line state)]
     (if (or (not line)
             (re-matches #"\s*" line)
             (re-matches #"\s*([#*+-]|[0-9]+\.|```).*" line))
@@ -25,45 +30,39 @@
       (parse-task-multi-line (-> task
                                  (update :raw str "\n" line)
                                  (update :text str " " (s/trim line)))
-                             (-> state
-                                 (update :lines rest)
-                                 (update :offset inc))))))
+                             state*))))
 
-(defn parse-task-meta [task {:keys [lines] :as state}]
-  (let [line (first lines)
+(defn parse-task-meta [task state]
+  (let [[line state*] (read-line state)
         indent (apply str (repeat (:indent task) " "))
         meta-re (re-pattern (str indent "-.*"))]
     (if (and line (re-matches meta-re line))
       (parse-task-meta (update task :meta (fnil conj []) line)
-                       (-> state
-                                 (update :lines rest)
-                                 (update :offset inc)))
+                       state*)
       [task state])))
 
 (defn parse-task [{:keys [lines offset] :as state}]
-  (when-let [[raw check text] (re-matches #"- \[(.)?\] (.+)" (first lines))]
-    (let [task {:raw raw
-                :indent 2 ; for nested tasks needs to be derived
-                :completed? (contains? #{"x" "X"} check)
-                :text (s/trim text)
-                :line offset}
-          state (-> state
-                    (update :lines rest)
-                    (update :offset inc))
-          [task state] (parse-task-multi-line task state)
-          [task state] (parse-task-meta task state)]
-      [task state])))
+  (let [[line state*] (read-line state)
+        [raw check text :as match] (re-matches #"- \[(.)?\] (.+)" line)]
+    (when match
+      (let [task {:raw raw
+                  :indent 2 ; for nested tasks needs to be derived
+                  :completed? (contains? #{"x" "X"} check)
+                  :text (s/trim text)
+                  :line offset}
+            [task state*] (parse-task-multi-line task state*)
+            [task state*] (parse-task-meta task state*)]
+        [task state*]))))
 
 (defn parse-tasks [state]
-  (loop [tasks [] {:keys [lines] :as state} state]
-    (if (and (seq lines)
-             (not (re-matches #"(#+)\s+(.+)" (first lines))))
-      (if-let [[task state] (parse-task state)]
-        (recur (conj tasks task) state)
-        (recur tasks (-> state
-                         (update :lines rest)
-                         (update :offset inc))))
-      [tasks state])))
+  (loop [tasks [] state state]
+    (let [[line state*] (read-line state)]
+      (if (and line (not (re-matches #"(#+)\s+(.+)"
+                                     line)))
+        (if-let [[task state] (parse-task state)]
+          (recur (conj tasks task) state)
+          (recur tasks state*))
+        [tasks state]))))
 
 (declare parse-node)
 
