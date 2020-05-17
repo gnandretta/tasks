@@ -6,8 +6,8 @@
 (defn find-tasks-in-files [paths]
   (let [c (chan)]
     (doseq [path paths]
-      (put! c {:path path
-               :tree (-> path fs/read-file p/parse)}))
+      (put! c (p/parse (fs/read-file path)
+                       path)))
     (close! c)
     c))
 
@@ -18,24 +18,7 @@
             (recur (conj xs x)))
           xs))))
 
-(defn flatten-tree ; TODO rename
-  ([tree] (flatten-tree tree 1))
-  ([tree lvl]
-   (reduce (fn [xs [k v]]
-             (cond
-               (string? k)
-               (apply conj
-                      xs
-                      (str (apply str (repeat lvl "#")) " " k)
-                      (flatten-tree v (inc lvl)))
-               (= k :tasks)
-               (apply conj xs (map :raw v))
-               :else xs))
-           []
-           tree)))
-
 (comment
+  (require '[clojure.pprint :refer [pprint]])
   (go (->> (<! (find-tasks "resources/**/*.md"))
-           (mapcat (comp flatten-tree :tree))
-           (map println)
-           doall)))
+           pprint)))
