@@ -4,16 +4,13 @@
             [clojure.core.async :as a :refer [<! chan close! go put!]]
             [clojure.string :as s]))
 
-(defn find-tasks-in-files [paths]
+(defn find-tasks [paths]
   (let [c (chan)]
     (doseq [path paths]
       (put! c (p/parse (fs/read-file path)
                        path)))
     (close! c)
-    c))
-
-(defn find-tasks [pattern]
-  (a/into [] (find-tasks-in-files (<! (fs/ls pattern)))))
+    (a/into [] c)))
 
 (defn filter-tasks [pred nodes]
   (->> nodes
@@ -63,9 +60,10 @@
   (s/includes? (:text task) s))
 
 (defn -main []
-  (go (->> (<! (find-tasks "resources/**/*.md"))
-           (filter-tasks (every-pred #(task-includes % "content") pending))
-           (map print-node)
-           doall)))
+  (go
+    (->> (<! (find-tasks (fs/find-files "resources" "md")))
+         (filter-tasks (every-pred #(task-includes % "content") pending))
+         (map print-node)
+         doall)))
 
 (set! *main-cli-fn* -main)
