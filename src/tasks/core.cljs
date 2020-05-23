@@ -1,7 +1,7 @@
 (ns tasks.core
   (:require [tasks.fs :as fs]
             [tasks.parser :as p]
-            [clojure.core.async :refer [<! chan close! go put!]]
+            [clojure.core.async :as a :refer [<! chan close! go put!]]
             [clojure.string :as s]))
 
 (defn find-tasks-in-files [paths]
@@ -13,11 +13,7 @@
     c))
 
 (defn find-tasks [pattern]
-  (go (let [c (find-tasks-in-files (<! (fs/ls pattern)))]
-        (loop [xs []]
-          (when-some [x (<! c)]
-            (recur (conj xs x)))
-          xs))))
+  (a/into [] (find-tasks-in-files (<! (fs/ls pattern)))))
 
 (defn filter-tasks [pred nodes]
   (->> nodes
