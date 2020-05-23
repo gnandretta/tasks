@@ -1,7 +1,8 @@
 (ns tasks.core
   (:require [tasks.fs :as fs]
             [tasks.parser :as p]
-            [clojure.core.async :refer [<! chan close! go put!]]))
+            [clojure.core.async :refer [<! chan close! go put!]]
+            [clojure.string :as s]))
 
 (defn find-tasks-in-files [paths]
   (let [c (chan)]
@@ -38,9 +39,17 @@
   (doseq [node nodes]
     (print-node node)))
 
+(defn completed [task]
+  (:completed? task))
+
+(def pending (complement completed))
+
+(defn task-includes [task s]
+  (s/includes? (:text task) s))
+
 (comment
   (require '[clojure.pprint :refer [pprint]])
   (go (->> (<! (find-tasks "resources/**/*.md"))
-           (filter-tasks (complement :completed?))
+           (filter-tasks (every-pred #(task-includes % "content") pending))
            (map print-node)
            doall)))
