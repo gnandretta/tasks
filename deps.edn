@@ -1,2 +1,3 @@
 {:deps {org.clojure/clojurescript {:mvn/version "1.10.758"}
-        org.clojure/core.async {:mvn/version "1.1.587"}}}
+        org.clojure/core.async {:mvn/version "1.1.587"}}
+ :aliases {:build {:main-opts ["--main" "cljs.main" "--target" "node" "--output-to" "tasks.js" "--compile" "tasks.core"]}}}
