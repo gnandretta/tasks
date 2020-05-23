@@ -66,9 +66,10 @@
 (defn task-includes [task s]
   (s/includes? (:text task) s))
 
-(comment
-  (require '[clojure.pprint :refer [pprint]])
+(defn -main []
   (go (->> (<! (find-tasks "resources/**/*.md"))
            (filter-tasks (every-pred #(task-includes % "content") pending))
            (map print-node)
            doall)))
+
+(set! *main-cli-fn* -main)
