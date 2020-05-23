@@ -1,3 +1,7 @@
 {:deps {org.clojure/clojurescript {:mvn/version "1.10.758"}
         org.clojure/core.async {:mvn/version "1.1.587"}}
- :aliases {:build {:main-opts ["--main" "cljs.main" "--target" "node" "--output-to" "tasks.js" "--compile" "tasks.core"]}}}
+ :aliases {:build {:main-opts ["--main" "cljs.main" "--target" "node" "--output-to" "tasks.js" "--compile" "tasks.core"]}
+           :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "0.7.0"}
+                                cider/piggieback {:mvn/version "0.5.0"}}
+                   :main-opts ["--main" "nrepl.cmdline" "--middleware" "[cider.piggieback/wrap-cljs-repl]"]}
+           :repl {:main-opts ["--main" "cljs.main" "--repl-env" "node"]}}}
