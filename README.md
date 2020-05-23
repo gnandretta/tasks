@@ -12,10 +12,10 @@ platform when written in a popular format such as markdown.
       tasks.
 - [x] Find tasks in a directory—search in markdown files from the directory and
       recursively in its sub-directories.
-- [ ] Filter completed tasks.
+- [x] Filter completed tasks.
   - [x] Include completion data in the parsed tree.
-  - [ ] Show only incomplete tasks.
-  - [ ] Show only complete tasks.
+  - [x] Show only incomplete tasks.
+  - [x] Show only complete tasks.
 - [ ] Attempt to integrate with an existent prompt library. Otherwise, page
       results and try to find a way to make it easy to edit tasks.
   - [x] Try [inquirer](https://www.npmjs.com/package/inquirer),
@@ -37,12 +37,14 @@ platform when written in a popular format such as markdown.
     [don't have infinite lists](https://github.com/SBoudrias/Inquirer.js/issues/206#issuecomment-199005812).
     For now let's have a command that just outputs text, put it to use and then
     implement something more interactive (using readline) only if it's worth it.
-  - [ ] Format output.
+  - [x] Format output.
   - [ ] Open with `vim` or `$EDITOR` positioning the cursor. Use text for
         heading and an optional number for task—maybe both should accept text or
         number.
 - [ ] Build script.
-- [ ] Improve prompts—do more than just show all tasks from all files.
+  - [x] Run main function when invoked from the command line.
+  - [ ] Read md paths from args.
+  - [ ] Add bin/build script that automates the build.
 - [ ] Support metadata for tracking.
   - [ ] *schedule* contains the date/time? to start working on the task.
   - [ ] *deadline* contains the latest date/time? the task should be completed.
@@ -50,10 +52,10 @@ platform when written in a popular format such as markdown.
   - [ ] *next* (default?) indicates the task should be completed in the
         immediate future, *someday* is for the distant future, *maybe* for task
         that may or may not be started.
+- [ ] Google calendar sync. Maybe this is all it takes for mobile.
 - [ ] Support nested tasks—as the one from above for the tracking metadata
       support. More than one level of nesting seems unlikely.
 - [ ] Support partially completed tasks—`[-]`.
-- [ ] Google calendar sync. Maybe this is all it takes for mobile.
 - [ ] Log actions. Most likely, it will involve updating the prompts and
       implementing commands that can be executed from the text editor. Logging
       should occur in a separate file.
