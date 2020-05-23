@@ -29,15 +29,34 @@
                   [(assoc props :tasks tasks) sections]))))
        (filter some?)))
 
+(defn ansi-escape [set reset]
+  (fn [s] (if process.stdout.isTTY
+            (str set s reset)
+            s)))
+
+(def bold (ansi-escape "\u001b[1m" "\u001b[22m"))
+(def magenta (ansi-escape "\u001b[35m" "\u001b[39m"))
+(def bright-magenta (ansi-escape "\u001b[95m" "\u001b[39m"))
+
 (defn print-tasks [tasks]
   (doseq [task tasks]
     (println (:raw task))))
 
 (defn print-node [[{:keys [path raw tasks]} nodes]]
-  (println (or path raw)) ; probably better to handle file and heading node types separately
+  ;; probably better to handle file and heading node types separately—but figure out what to do
+  ;; with empty lines
+  (when path                                                ; file
+    (println (-> path bright-magenta)))
+  (when raw                                                 ; heading
+    (println (-> raw magenta bold))
+    (println))
   (print-tasks tasks)
+  (println)
   (doseq [node nodes]
-    (print-node node)))
+    (print-node node))
+  (when path                                                ; file—shouldn't happen on last file
+    (println)
+    (println)))
 
 (defn completed [task]
   (:completed? task))
