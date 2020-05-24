@@ -61,7 +61,8 @@
 
 (defn parse-args [args]
   (let [parsed-args (loop [args args parsed-args {:paths     []
-                                                  :filter-fn pending}]
+                                                  :filter-fn pending
+                                                  :search-fn (constanly true)}]
                       (if-let [arg (first args)]
                         (case arg       ; think about names
                           ("-a" "--all") (recur (rest args)
@@ -73,6 +74,9 @@
                           ("-p" "--pending") (recur (rest args)
                                                     (assoc parsed-args
                                                       :filter-fn pending))
+                          ("-s" "--search") (recur (rest (rest args)) ; what happens if there's no search string?
+                                                   (assoc parsed-args
+                                                     :search-fn #(task-includes % (first (rest args)))))
                           (recur (rest args)
                                  (update parsed-args :paths conj arg)))
                         parsed-args))
@@ -88,10 +92,10 @@
     parsed-args))
 
 (defn -main [& args]
-  (let [{:keys [paths filter-fn]} (parse-args args)]
+  (let [{:keys [paths filter-fn search-fn]} (parse-args args)]
     (go
       (->> (<! (find-tasks paths))
-           (filter-tasks filter-fn)
+           (filter-tasks (every-pred filter-fn search-fn))
            (map print-node)
            doall))))
 
