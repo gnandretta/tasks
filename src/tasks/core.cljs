@@ -60,22 +60,32 @@
   (s/includes? (:text task) s))
 
 (defn parse-args [args]
-  (let [[paths filter-fn] (loop [args args paths [] filter-fn pending]
-                           (if-let [arg (first args)]
-                             (case arg                      ; think about names
-                               ("-a" "--all") (recur (rest args) paths (constantly true))
-                               ("-c" "--completed") (recur (rest args) paths completed)
-                               ("-p" "--pending") (recur (rest args) paths pending)
-                               (recur (rest args) (conj paths arg) filter-fn))
-                             [paths filter-fn]))
-        paths (mapcat (fn [path]
-                        (cond
-                          (fs/dir? path) (fs/find-files path "md")
-                          (and (fs/file? path) (s/ends-with? path ".md")) path
-                          :else []))                        ; handle unknown paths
-                      (if (empty? paths) [(process.cwd)] paths))]
-    {:paths     paths
-     :filter-fn filter-fn}))
+  (let [parsed-args (loop [args args parsed-args {:paths     []
+                                                  :filter-fn pending}]
+                      (if-let [arg (first args)]
+                        (case arg       ; think about names
+                          ("-a" "--all") (recur (rest args)
+                                                (assoc parsed-args
+                                                  :filter-fn (constantly true)))
+                          ("-c" "--completed") (recur (rest args)
+                                                      (assoc parsed-args
+                                                        :filter-fn completed))
+                          ("-p" "--pending") (recur (rest args)
+                                                    (assoc parsed-args
+                                                      :filter-fn pending))
+                          (recur (rest args)
+                                 (update parsed-args :paths conj arg)))
+                        parsed-args))
+        parsed-args (update parsed-args
+                            :paths
+                            (fn [paths]
+                              (mapcat (fn [path]
+                                        (cond
+                                          (fs/dir? path) (fs/find-files path "md")
+                                          (and (fs/file? path) (s/ends-with? path ".md")) path
+                                          :else [])) ; handle unknown paths
+                                      (if (empty? paths) [(process.cwd)] paths))))]
+    parsed-args))
 
 (defn -main [& args]
   (let [{:keys [paths filter-fn]} (parse-args args)]
