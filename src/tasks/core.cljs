@@ -22,6 +22,11 @@
                   [(assoc props :tasks tasks) sections]))))
        (filter some?)))
 
+(defn first-task [nodes]
+  (some (fn [[{:keys [tasks]} sections]]
+          (or (first tasks) (first-task sections)))
+        nodes))
+
 (defn ansi-escape [set reset]
   (fn [s] (if process.stdout.isTTY
             (str set s reset)
@@ -62,7 +67,8 @@
 (defn parse-args [args]
   (let [parsed-args (loop [args args parsed-args {:paths     []
                                                   :filter-fn pending
-                                                  :search-fn (constanly true)}]
+                                                  :search-fn (constantly true)
+                                                  :edit? false}]
                       (if-let [arg (first args)]
                         (case arg       ; think about names
                           ("-a" "--all") (recur (rest args)
@@ -77,6 +83,8 @@
                           ("-s" "--search") (recur (rest (rest args)) ; what happens if there's no search string?
                                                    (assoc parsed-args
                                                      :search-fn #(task-includes % (first (rest args)))))
+                          ("-e" "--edit") (recur (rest args)
+                                                 (assoc parsed-args :edit? true))
                           (recur (rest args)
                                  (update parsed-args :paths conj arg)))
                         parsed-args))
@@ -91,12 +99,24 @@
                                       (if (empty? paths) [(process.cwd)] paths))))]
     parsed-args))
 
+(def spawn (.-spawn (js/require "child_process")))
+
+(defn edit-file
+  ([path] (edit-file path nil))
+  ([path line]
+   (spawn (or process.env.EDITOR "vi")  ; ${EDITOR:-vi} doesn't work
+          (clj->js (if (nil? line)
+                     [path]
+                     [(str "+" line) path]))
+          #js {:stdio "inherit"})))
+
 (defn -main [& args]
-  (let [{:keys [paths filter-fn search-fn]} (parse-args args)]
-    (go
-      (->> (<! (find-tasks paths))
-           (filter-tasks (every-pred filter-fn search-fn))
-           (map print-node)
-           doall))))
+  (go (let [{:keys [paths filter-fn search-fn edit?]} (parse-args args)
+            nodes (->> (<! (find-tasks paths))
+                       (filter-tasks (every-pred filter-fn search-fn)))]
+        (if edit?
+          (when-let [{:keys [file line]} (first-task nodes)]
+            (edit-file file line))
+          (doall (map print-node nodes))))))
 
 (set! *main-cli-fn* -main)
