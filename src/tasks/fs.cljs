@@ -24,7 +24,7 @@
               (dir? path)
               (into paths (find-files path ext))
 
-              :else  []))
+              :else paths))
           []
           (ls dir)))
 
