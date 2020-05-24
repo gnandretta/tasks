@@ -59,11 +59,20 @@
 (defn task-includes [task s]
   (s/includes? (:text task) s))
 
-(defn -main []
-  (go
-    (->> (<! (find-tasks (fs/find-files "resources" "md")))
-         (filter-tasks (every-pred #(task-includes % "content") pending))
-         (map print-node)
-         doall)))
+(defn parse-args [args]
+  {:paths (mapcat (fn [path]
+                    (cond
+                      (fs/dir? path) (fs/find-files path "md")
+                      (and (fs/file? path) (s/ends-with? path ".md")) path
+                      :else []))                            ; handle unknown paths
+                  (if (empty? args) [(process.cwd)] args))})
+
+(defn -main [& args]
+  (let [{:keys [paths]} (parse-args args)]
+    (go
+      (->> (<! (find-tasks paths))
+           (filter-tasks (every-pred #(task-includes % "content") pending))
+           (map print-node)
+           doall))))
 
 (set! *main-cli-fn* -main)
