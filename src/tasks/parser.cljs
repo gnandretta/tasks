@@ -21,7 +21,7 @@
                       :raw raw
                       :rank (count hashes)
                       :text (s/trim text)
-                      :line (inc offset)}
+                      :line (inc offset)} ; is this used?
              state* (assoc state* :depth (count hashes))]
          [heading state*]))))
 
@@ -45,13 +45,14 @@
                        state*)
       [task state])))
 
-(defn parse-task [{:keys [offset] :as state}]
+(defn parse-task [{:keys [file offset] :as state}]
   (let [[[raw check text :as m] state*] (parse-line state #"- \[(.)?\] (.+)")]
     (when m
       (let [task {:raw raw
                   :indent 2 ; for nested tasks needs to be derived
                   :completed? (contains? #{"x" "X"} check)
                   :text (s/trim text)
+                  :file file
                   :line (inc offset)}
             [task state*] (parse-task-multi-line task state*)
             [task state*] (parse-task-meta task state*)]
@@ -88,6 +89,7 @@
 
 (defn parse [md path]
   (first (parse-node {:type :file :path path}
-                     {:lines (s/split-lines md)
+                     {:file path
+                      :lines (s/split-lines md)
                       :offset 0
                       :depth 0})))
