@@ -21,7 +21,7 @@
                       :raw raw
                       :rank (count hashes)
                       :text (s/trim text)
-                      :line offset}
+                      :line (inc offset)}
              state* (assoc state* :depth (count hashes))]
          [heading state*]))))
 
@@ -52,7 +52,7 @@
                   :indent 2 ; for nested tasks needs to be derived
                   :completed? (contains? #{"x" "X"} check)
                   :text (s/trim text)
-                  :line offset}
+                  :line (inc offset)}
             [task state*] (parse-task-multi-line task state*)
             [task state*] (parse-task-meta task state*)]
         [task state*]))))
