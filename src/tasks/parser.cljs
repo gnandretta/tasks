@@ -37,7 +37,7 @@
                                  (update :text str " " (s/trim line)))
                              state*))))
 
-(def special-words ["scheduled" "deadline" "completed"])
+(def special-words ["scheduled" "deadline" "completed" "maybe"])
 
 (defn parse-date [s]
   (try (t/date (s/replace s "/" "-"))
@@ -58,6 +58,9 @@
   (case kind
     (:scheduled :deadline :completed)
     {:date (parse-date-and-time args)}
+
+    :maybe
+    {:when (s/trim args)}
 
     {}))
 

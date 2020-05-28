@@ -16,7 +16,7 @@
 
 - [ ] task 1.1.1a with a really, really, really, long text that needs to be
       wrapped across multiple lines.
-  - metadata
+  - maybe
 - [x] task 1.1.1b with content.
   - completed 2020-01-03
 
