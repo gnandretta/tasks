@@ -1,5 +1,6 @@
 (ns tasks.parser
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [tick.alpha.api :as t]))
 
 (defn read-line [{:keys [lines] :as state}]
   (when (seq lines)
@@ -36,14 +37,49 @@
                                  (update :text str " " (s/trim line)))
                              state*))))
 
+(def special-words ["scheduled" "deadline" "completed"])
+
+(defn parse-date [s]
+  (try (t/date (s/replace s "/" "-"))
+    (catch :default _
+      nil)))
+
+(defn parse-time [s]
+  (try (t/time s)
+      (catch :default _
+        nil)))
+
+(defn parse-date-and-time [s]
+  (let [[date-str time-str] (filter not-empty (s/split s #" "))]
+    {:date (parse-date date-str)
+     :time (parse-time time-str)}))
+
+(defn parse-task-meta-item-args [kind args]
+  (case kind
+    (:scheduled :deadline :completed)
+    {:date (parse-date-and-time args)}
+
+    {}))
+
+(defn parse-task-meta-item [indent state]
+  (let [meta-re (re-pattern (str "(?i)"
+                                 (apply str (repeat indent "\\s"))
+                                 "-\\s+(("
+                                 (s/join "|" special-words)
+                                 ")(.+)?|.+)"))
+        [[line text special-word args] state] (parse-line state meta-re)]
+    (when line
+      (let [kind (or (keyword special-word) :unknown)
+            meta (merge (parse-task-meta-item-args kind (or args ""))
+                        {:kind kind
+                         :text (s/trim text)
+                         :raw  line})]
+        [meta state]))))
+
 (defn parse-task-meta [task state]
-  (let [indent (apply str (repeat (:indent task) " "))
-        meta-re (re-pattern (str indent "-.*"))
-        [line state*] (parse-line state meta-re)]
-    (if line
-      (parse-task-meta (update task :meta (fnil conj []) line)
-                       state*)
-      [task state])))
+  (if-let [[meta state*] (parse-task-meta-item (:indent task) state)]
+    (recur (update task :meta (fnil conj []) meta) state*)
+    [task state]))
 
 (defn parse-task [{:keys [file offset] :as state}]
   (let [[[raw check text :as m] state*] (parse-line state #"- \[(.)?\] (.+)")]
