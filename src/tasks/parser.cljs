@@ -26,16 +26,16 @@
              state* (assoc state* :depth (count hashes))]
          [heading state*]))))
 
-(defn parse-task-multi-line [task state]
+(defn parse-task-multiline [task state]
   (let [[line state*] (read-line state)]
     (if (or (not line)
             (re-matches #"\s*" line)
             (re-matches #"\s*([#*+-]|[0-9]+\.|```).*" line))
       [task state]
-      (parse-task-multi-line (-> task
-                                 (update :raw str "\n" line)
-                                 (update :text str " " (s/trim line)))
-                             state*))))
+      (parse-task-multiline (-> task
+                                (update :raw str "\n" line)
+                                (update :text str " " (s/trim line)))
+                            state*))))
 
 (def special-words ["scheduled" "deadline" "completed" "maybe"])
 
@@ -93,7 +93,7 @@
                   :text (s/trim text)
                   :file file
                   :line (inc offset)}
-            [task state*] (parse-task-multi-line task state*)
+            [task state*] (parse-task-multiline task state*)
             [task state*] (parse-task-meta task state*)]
         [task state*]))))
 
