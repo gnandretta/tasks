@@ -43,16 +43,16 @@
 (defn print-node [[{:keys [path raw tasks]} nodes]]
   ;; probably better to handle file and heading node types separately—but figure out what to do
   ;; with empty lines
-  (when path                                                ; file
+  (when path                            ; file
     (println (-> path bright-magenta)))
-  (when raw                                                 ; heading
+  (when raw                             ; heading
     (println (-> raw magenta bold))
     (println))
   (print-tasks tasks)
   (println)
   (doseq [node nodes]
     (print-node node))
-  (when path                                                ; file—shouldn't happen on last file
+  (when path                            ; file—shouldn't happen on last file
     (println)
     (println)))
 
@@ -68,7 +68,7 @@
   (let [parsed-args (loop [args args parsed-args {:paths     []
                                                   :filter-fn pending
                                                   :search-fn (constantly true)
-                                                  :edit? false}]
+                                                  :edit?     false}]
                       (if-let [arg (first args)]
                         (case arg       ; think about names
                           ("-a" "--all") (recur (rest args)

@@ -18,13 +18,13 @@
 (defn parse-heading [{:keys [offset depth] :as state}]
   (let [[[raw hashes text :as m] state*] (parse-line state #"(#+)\s+(.+)")]
     (when (and m (> (count hashes) depth))
-       (let [heading {:type :heading
-                      :raw raw
-                      :rank (count hashes)
-                      :text (s/trim text)
-                      :line (inc offset)} ; is this used?
-             state* (assoc state* :depth (count hashes))]
-         [heading state*]))))
+      (let [heading {:type :heading
+                     :raw  raw
+                     :rank (count hashes)
+                     :text (s/trim text)
+                     :line (inc offset)} ; is this used?
+            state* (assoc state* :depth (count hashes))]
+        [heading state*]))))
 
 (defn parse-task-multiline [task state]
   (let [[line state*] (read-line state)]
@@ -41,13 +41,13 @@
 
 (defn parse-date [s]
   (try (t/date (s/replace s "/" "-"))
-    (catch :default _
-      nil)))
+       (catch :default _
+         nil)))
 
 (defn parse-time [s]
   (try (t/time s)
-      (catch :default _
-        nil)))
+       (catch :default _
+         nil)))
 
 (defn parse-date-and-time [s]
   (let [[date-str time-str] (filter not-empty (s/split s #" "))]
@@ -87,12 +87,12 @@
 (defn parse-task [{:keys [file offset] :as state}]
   (let [[[raw check text :as m] state*] (parse-line state #"- \[(.)?\] (.+)")]
     (when m
-      (let [task {:raw raw
-                  :indent 2 ; for nested tasks needs to be derived
+      (let [task {:raw        raw
+                  :indent     2         ; for nested tasks needs to be derived
                   :completed? (contains? #{"x" "X"} check)
-                  :text (s/trim text)
-                  :file file
-                  :line (inc offset)}
+                  :text       (s/trim text)
+                  :file       file
+                  :line       (inc offset)}
             [task state*] (parse-task-multiline task state*)
             [task state*] (parse-task-meta task state*)]
         [task state*]))))
@@ -128,7 +128,7 @@
 
 (defn parse [md path]
   (first (parse-node {:type :file :path path}
-                     {:file path
-                      :lines (s/split-lines md)
+                     {:file   path
+                      :lines  (s/split-lines md)
                       :offset 0
-                      :depth 0})))
+                      :depth  0})))
