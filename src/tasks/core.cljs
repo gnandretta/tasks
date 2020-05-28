@@ -94,7 +94,7 @@
                               (mapcat (fn [path]
                                         (cond
                                           (fs/dir? path) (fs/find-files path "md")
-                                          (and (fs/file? path) (s/ends-with? path ".md")) path
+                                          (and (fs/file? path) (s/ends-with? path ".md")) [path]
                                           :else [])) ; handle unknown paths
                                       (if (empty? paths) [(process.cwd)] paths))))]
     parsed-args))
