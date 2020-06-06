@@ -16,7 +16,7 @@ platform when written in a popular format such as markdown.
   - [x] Include completion data in the parsed tree.
   - [x] Show only incomplete tasks.
   - [x] Show only complete tasks.
-- [ ] Attempt to integrate with an existent prompt library. Otherwise, page
+- [x] Attempt to integrate with an existent prompt library. Otherwise, page
       results and try to find a way to make it easy to edit tasks.
   - [x] Try [inquirer](https://www.npmjs.com/package/inquirer),
         [prompt](https://www.npmjs.com/package/prompt), and
@@ -38,18 +38,18 @@ platform when written in a popular format such as markdown.
     For now let's have a command that just outputs text, put it to use and then
     implement something more interactive (using readline) only if it's worth it.
   - [x] Format output.
-  - [ ] Open with `vim` or `$EDITOR` positioning the cursor. Use text for
+  - [x] Open with `vim` or `$EDITOR` positioning the cursor. Use text for
         heading and an optional number for task—maybe both should accept text or
         number.
 - [ ] Build script.
   - [x] Run main function when invoked from the command line.
-  - [ ] Read md paths from args.
+  - [x] Read md paths from args.
   - [ ] Add bin/build script that automates the build.
 - [ ] Support metadata for tracking.
-  - [ ] *schedule* contains the date/time? to start working on the task.
-  - [ ] *deadline* contains the latest date/time? the task should be completed.
-  - [ ] *completed at* contains the date/time? the task was completed.
-  - [ ] *next* (default?) indicates the task should be completed in the
+  - [x] *scheduled* contains the date/time? to start working on the task.
+  - [x] *deadline* contains the latest date/time? the task should be completed.
+  - [x] *completed* contains the date/time? the task was completed.
+  - [ ] *next* indicates the task should be completed in the
         immediate future, *someday* is for the distant future, *maybe* for task
         that may or may not be started.
 - [ ] Google calendar sync. Maybe this is all it takes for mobile.
@@ -61,3 +61,6 @@ platform when written in a popular format such as markdown.
       should occur in a separate file.
 - [ ] Archive tasks.
 - [ ] Interactive prompt?
+- [ ] Parse args with https://github.com/clojure/tools.cli?
+- [ ] Try using https://github.com/borkdude/babashka?
+  - https://github.com/borkdude/babashka/blob/master/examples/process_builder.clj
